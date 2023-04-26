@@ -1,0 +1,48 @@
+@import url('fontsGoogle.css');
+
+:root{
+    --fundo: #2D2F33;
+    --sidebar: #343537;
+    --roxo: #ae00ff;
+    --sobretomRoxo: #7700a6;
+    --azul: #2e0dff;
+    --azulCeleste: #45f3ff;
+    --branco: #f6f6f6;
+    --placeholder: #b1b2b5;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.bg-padrao{
+    background-color: var(--fundo);
+}
+
+.bg-sidebar{
+    background-color: var(--sidebar);
+}
+
+.bg-celeste{
+    background-color: var(--azulCeleste);
+}
+
+.card-borders{
+    background: linear-gradient(#7700a6, #2e0dff);
+}
+
+.card-container{
+    margin: auto;
+}
+
+.max-w-40{
+    max-width: 10rem;
+}
+.active{
+    border: 0.1rem solid #7700a6;
+    padding: 5px;
+    border-radius: 20px;
+}
