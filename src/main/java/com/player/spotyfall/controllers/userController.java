@@ -27,7 +27,7 @@ public class userController extends HttpServlet {
 
         // Criando um objectMapper do Jackson e transformando em um JSON
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(listUsers);
+        String jsonString = objectMapper.writeValueAsString(user);
 
         // Retornando o conteúdo
         response.setContentType("application/json");

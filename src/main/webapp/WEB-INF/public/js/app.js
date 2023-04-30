@@ -3,20 +3,27 @@ import { userModel } from './models.js'
 import request from './utils.js'
 
 // Criação dos componentes com conteúdo
-const Home  = () => import('../views/home.js')
-const Search = () => import('../views/search.js')
-
-const Liked = {template: '<div><p class="text-white">componente liked</p></div>'}
-const Artists = {template: '<div><p class="text-white">componente artists</p></div>'}
+const home  = () => import('../views/home.js')
+const search = () => import('../views/search.js')
+const liked = () => import('../views/liked.js')
+const artists = () => import('../views/artists.js')
+const playlistsView = () => import('../views/playlists-view.js')
+const privacy = () => import('../views/privacy.js')
+const technologies = () => import('../views/technologies.js')
+const user = () => import('../views/user.js')
 
 
 // Criação das rotas do router
 const routes =[
     { path: '/', redirect: "/home"},
-    { path: '/home', name: "home", component: Home},
-    { path: "/search", name: "search", component: Search},
-    { path: '/liked', name: "liked", component: Liked},
-    { path: "/artists", name: "artists", component: Artists}
+    { path: '/home', name: "home", component: home},
+    { path: "/search", name: "search", component: search},
+    { path: '/liked', name: "liked", component: liked},
+    { path: "/artists", name: "artists", component: artists},
+    { path: "/playlists-view/:id", name: "view playlist", component: playlistsView},
+    { path: "/technologies", name: "used technologies", component: technologies},
+    { path: "/privacy", name: "privacy", component: privacy},
+    { path: "/user", name: "user page", component: user},
 ]
 
 // Criação do Router
@@ -31,18 +38,20 @@ const app = Vue.createApp({
     data(){
         return {
             iconsColor: "#f6f6f6",
-            usuario: null
+            user: null,
+            loading: true
         }
     },
     methods:{
-        fetchUser: function(){
-            return request("userController", (data)=>{
-                return new userModel(data.data)
-            })
+        fetchUser: async () => {
+            const response = await request("userController");
+            const user = new userModel(response.data);
+            return user;
         }
     },
     async mounted(){
-        this.usuario = console.log(await this.fetchUser())
+        this.user = await this.fetchUser()
+        this.loading = false
     }
 })
 .use(router)
