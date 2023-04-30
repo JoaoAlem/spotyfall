@@ -28,10 +28,8 @@ export function define(model, source, vars){
  * @param callbackSuccess
  * @param callbackError
  */
-async function request(route, callbackSuccess, callbackError){
-    await axios.get(route)
-        .then(callbackSuccess)
-        .catch(callbackError)
+async function request(route){
+    return await axios.get(route);
 }
 
 export default request
