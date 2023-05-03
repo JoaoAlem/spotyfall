@@ -21,7 +21,7 @@
 
                     <!-- links de auxilio -->
                     <div class="flex justify-between text-xs text-[#f6f6f6]">
-                        <a href="./signin.jsp">Já possui cadastro ? Faça login aqui</a>
+                        <a href="./login.jsp">Já possui cadastro ? Faça login aqui</a>
                     </div>
 
                     <button type="submit" class="border-2 border-[#45f3ff] rounded-xl bg-[#45f3ff] w-[100px] h-[40px] sm:ml-auto">Cadastrar</button>
