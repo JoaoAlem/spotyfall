@@ -3,12 +3,17 @@ package com.player.spotyfall.controllers;
 import java.io.*;
 import java.util.*;
 import com.player.spotyfall.models.Usuarios;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet(name = "userController", value = "/userController")
 public class userController extends HttpServlet {
+
+    public String getImageURL(HttpServletRequest request){
+        return "URL";
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Criando o objeto e definindo seus atributos
@@ -33,5 +38,10 @@ public class userController extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(jsonString);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        super.doPost(req, resp);
     }
 }
