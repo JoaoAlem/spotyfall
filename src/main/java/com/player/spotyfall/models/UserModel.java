@@ -1,52 +1,18 @@
 package com.player.spotyfall.models;
 
 import com.player.spotyfall.modules.database.Database;
-import com.player.spotyfall.modules.database.databaseFault;
 
-import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public class Usuarios {
+public class UserModel {
     /* Dados do usuario */
     private int id;
     private String name, surname, username, email, phone, password, userImage;
 
     /* Dados do banco de dados */
-    private String[] colunas = new String[]{"name", "surname", "username"};
+    private String[] colunas = new String[]{"name", "surname", "username", "email", "phone", "userImage"};
 
-    /* Colocar dentro do construtor ou já criar com as colunas definidas
-    public Usuarios(){
-        this.colunas = new String[]{"name", "surname", "username"};
-    }*/
-
+    /* Metodos do banco de dados */
     public Database users(){
-        return new Database("users");
-    }
-
-    /* Method Overloading */
-    public ResultSet getUsers() throws databaseFault, SQLException {
-        return users()
-                .Columns(colunas)
-                .Where("deleteDate is null")
-                .Select();
-    }
-
-    public ResultSet getUsers(String name) throws databaseFault, SQLException {
-        return users()
-                .Columns(colunas)
-                .Where("name", "!=", "murilo")
-                .Select();
-    }
-
-    public static void main(String[] args) throws databaseFault, SQLException {
-        Usuarios users = new Usuarios();
-
-        ResultSet rs = users.getUsers("joao");
-
-        while(rs.next()){
-            System.out.println(rs.getString("name"));
-        }
+        return new Database("users").Columns(colunas);
     }
 
     /* Getters e setters */

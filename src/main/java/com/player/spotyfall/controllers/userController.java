@@ -1,47 +1,62 @@
 package com.player.spotyfall.controllers;
 
 import java.io.*;
-import java.util.*;
-import com.player.spotyfall.models.Usuarios;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.player.spotyfall.models.UserModel;
+import com.player.spotyfall.modules.custom.UserMethods;
+import com.player.spotyfall.modules.database.databaseFault;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebServlet(name = "userController", value = "/userController")
 public class userController extends HttpServlet {
 
-    public String getImageURL(HttpServletRequest request){
-        return "URL";
-    }
+    // Objetos de acesso
+    UserModel user = new UserModel();
+    UserMethods methods = new UserMethods();
+    ResultSet rs;
+    ObjectMapper objectMapper;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Criando o objeto e definindo seus atributos
-        Usuarios user = new Usuarios();
-        user.setId(1);
-        user.setName("João Antonio");
-        user.setSurname("Alem");
-        user.setUsername("joao.aalem");
-        user.setEmail("joão.aalem@spotyfall.com");
-        user.setPhone("19 997630939");
-        user.setPassword("teste123");
-        user.setUserImage("teste.png");
 
-        List<Usuarios> listUsers = new ArrayList<Usuarios>();
-        listUsers.add(user);
-
-        // Criando um objectMapper do Jackson e transformando em um JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(user);
-
-        // Retornando o conteúdo
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(jsonString);
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        super.doGet(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            objectMapper = new ObjectMapper();
+            user = objectMapper.readValue(req.getReader(), UserModel.class);
+
+            rs = methods.GetUser(user.getUsername(), user.getPassword());
+
+            while(rs.next()){
+                user.setName(rs.getString("name"));
+                user.setSurname(rs.getString("surname"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                user.setUserImage(rs.getString("userImage"));
+            }
+
+            // Criando um objectMapper do Jackson e transformando em um JSON
+            objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writeValueAsString(user);
+
+            // Retornando o conteúdo
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().write(jsonString);
+        } catch (databaseFault e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
