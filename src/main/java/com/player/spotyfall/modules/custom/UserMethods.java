@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 public class UserMethods extends UserModel
 {
-    private Database userTable = new UserModel().users();
+    private final Database userTable = users();
 
     public ResultSet GetUser(String login, String password) throws databaseFault, SQLException
     {

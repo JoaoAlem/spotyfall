@@ -1,10 +1,13 @@
 package com.player.spotyfall.controllers;
 
 import java.io.*;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import com.player.spotyfall.models.UserModel;
 import com.player.spotyfall.modules.custom.UserMethods;
@@ -23,39 +26,47 @@ public class userController extends HttpServlet {
     ResultSet rs;
     ObjectMapper objectMapper;
 
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        super.doGet(request, response);
-    }
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             objectMapper = new ObjectMapper();
-            user = objectMapper.readValue(req.getReader(), UserModel.class);
+            Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
 
-            rs = methods.GetUser(user.getUsername(), user.getPassword());
+            String username = (String) payloadMap.get("username");
+            String password = (String) payloadMap.get("password");
 
-            while(rs.next()){
+            /* Recolhendo os dados do banco de dados */
+            rs = methods.GetUser(username, password);
+
+            // se não existir dados, então retorna um eror
+            if(rs == null || !rs.next()){
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+
+                String errorMessage = "User not found.";
+                String errorJson = "{\"error\":\"" + errorMessage + "\"}";
+                resp.getWriter().write(errorJson);
+            }else{
                 user.setName(rs.getString("name"));
                 user.setSurname(rs.getString("surname"));
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
                 user.setPhone(rs.getString("phone"));
                 user.setUserImage(rs.getString("userImage"));
+
+                // Criando um objectMapper do Jackson e transformando em um JSON
+                objectMapper = new ObjectMapper();
+                String jsonString = objectMapper.writeValueAsString(user);
+
+                // Retornando o conteúdo
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().write(jsonString);
             }
 
-            // Criando um objectMapper do Jackson e transformando em um JSON
-            objectMapper = new ObjectMapper();
-            String jsonString = objectMapper.writeValueAsString(user);
-
-            // Retornando o conteúdo
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-            resp.getWriter().write(jsonString);
-        } catch (databaseFault e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
+            rs.close();
+        } catch (databaseFault | SQLException e) {
             throw new RuntimeException(e);
         }
     }

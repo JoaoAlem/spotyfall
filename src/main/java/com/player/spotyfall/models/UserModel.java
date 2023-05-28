@@ -8,7 +8,7 @@ public class UserModel {
     private String name, surname, username, email, phone, password, userImage;
 
     /* Dados do banco de dados */
-    private String[] colunas = new String[]{"name", "surname", "username", "email", "phone", "userImage"};
+    private String[] colunas = new String[]{"id", "name", "surname", "username", "email", "phone", "userImage"};
 
     /* Metodos do banco de dados */
     public Database users(){
