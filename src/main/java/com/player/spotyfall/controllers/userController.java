@@ -48,6 +48,7 @@ public class userController extends HttpServlet {
                 String errorJson = "{\"error\":\"" + errorMessage + "\"}";
                 resp.getWriter().write(errorJson);
             }else{
+                user.setId(rs.getInt("id"));
                 user.setName(rs.getString("name"));
                 user.setSurname(rs.getString("surname"));
                 user.setUsername(rs.getString("username"));
@@ -68,6 +69,31 @@ public class userController extends HttpServlet {
             rs.close();
         } catch (databaseFault | SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try{
+            objectMapper = new ObjectMapper();
+            Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
+            methods.SaveUser(payloadMap);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+
+            String successMessage = "User saved successfully";
+            String successJson = "{\"message\":\"" + successMessage + "\"}";
+            resp.getWriter().write(successJson);
+        } catch (Exception e){
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+
+            String errorMessage = "Error occurred while saving user";
+            String errorJson = "{\"error\":\"" + errorMessage + "\"}";
+            resp.getWriter().write(errorJson);
         }
     }
 }

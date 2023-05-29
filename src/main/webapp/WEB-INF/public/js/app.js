@@ -1,5 +1,5 @@
 // realizando o import do models e utils
-import { userModel } from './models.js'
+import { userModel, albumModel } from './models.js'
 import request from './utils.js'
 
 // Criação dos componentes com conteúdo
@@ -52,6 +52,9 @@ const app = Vue.createApp({
         },
         UserModel(data){
             return new userModel(data)
+        },
+        AlbunsModel(data){
+            return new albumModel(data)
         }
     },
     async mounted(){

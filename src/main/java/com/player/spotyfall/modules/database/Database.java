@@ -3,7 +3,6 @@ package com.player.spotyfall.modules.database;
 import com.player.spotyfall.modules.Utils;
 import org.apache.commons.text.StringSubstitutor;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +45,16 @@ public class Database {
     private ResultSet execute() throws SQLException {
         PreparedStatement ps = this.conn.prepareStatement(this._query);
         return ps.executeQuery();
+    }
+
+    /** Função que vai executar a query do banco de dados, ainda somente selects
+     *
+     * @return ResultSet com oque foi encontrado do banco de dados
+     * @throws SQLException um erro do SQL
+     */
+    private void executeUpdate() throws SQLException {
+        PreparedStatement ps = this.conn.prepareStatement(this._query);
+        ps.executeUpdate();
     }
 
     /** Define as colunas desejadas para o objeto do banco de dados
@@ -186,7 +195,7 @@ public class Database {
      * @return ResultSet com os resultados obtidos
      * @throws SQLException erro do sql
      */
-    private Map SelectMap(){
+    private Map<String, String> SelectMap(){
         Map<String, String> _query = new HashMap<>();
         _query.put("columns", String.join(", ", this._columns));
         _query.put("where", this.getWhere().toString());
@@ -201,7 +210,6 @@ public class Database {
      * @throws SQLException
      */
     public ResultSet Select() throws SQLException {
-
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
         this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${where}");
 
@@ -226,7 +234,56 @@ public class Database {
     ===============================================
      */
 
-    public void Put(Array data, Database table){
+    public void Put(Map<String, Object> data, String id) throws SQLException {
+        Map<String, String> _queryHelper = new HashMap<>();
+        _queryHelper.put("table", this.table);
 
+        if(Utils.validateString(id)){
+            int columnCount = 0;
+
+            _queryHelper.put("where", this.getWhere().toString());
+
+            this._query = "UPDATE ${table} SET ";
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                String columnName = entry.getKey();
+                Object columnValue = entry.getValue();
+
+                this._query += columnName + " = " + columnValue + ", ";
+                columnCount++;
+            }
+
+            // remover a virgula extra
+            if (columnCount > 0) {
+                this._query = this._query.substring(0, this._query.length() - 2);
+            }
+
+            this._query += " ${where};";
+
+            StringSubstitutor substitutor = new StringSubstitutor(_queryHelper);
+            this._query = substitutor.replace(this._query);
+        } else{
+            this._query = "INSERT INTO ${table} (";
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                String columnName = entry.getKey();
+                this._query += columnName + ", ";
+            }
+
+            // remover a virgula extra
+            this._query = this._query.substring(0, this._query.length() - 2);
+            this._query += ") VALUES (";
+
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                Object columnValue = entry.getValue();
+                this._query += "'" +  columnValue + "', ";
+            }
+
+            this._query = this._query.substring(0, this._query.length() - 2);
+            this._query += ");";
+
+            StringSubstitutor substitutor = new StringSubstitutor(_queryHelper);
+            this._query = substitutor.replace(this._query);
+        }
+
+        this.executeUpdate();
     }
 }

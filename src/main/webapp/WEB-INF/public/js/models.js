@@ -8,6 +8,7 @@ export class userModel {
                 surname: null,
                 username: null,
                 email: null,
+                password: null,
                 phone: null,
                 userImage: null,
             }
@@ -39,7 +40,7 @@ export class playlistModel {
     }
 }
 
-export class AlbumModel {
+export class albumModel {
     constructor(i){
         define(this, i, {
             id: null,

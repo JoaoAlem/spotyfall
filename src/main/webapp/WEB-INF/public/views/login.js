@@ -51,7 +51,11 @@ export default {
 
             this.$root.request("userController", "post", data)
                 .then((response) =>{
-                    this.$root.user = this.$root.UserModel(response.data)
+                    if(response.data)
+                        this.$root.user = this.$root.UserModel(response.data)
+                })
+                .catch((error) =>{
+                    console.error(error)
                 })
         }
     }
