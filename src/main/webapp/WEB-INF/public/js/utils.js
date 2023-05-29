@@ -28,8 +28,15 @@ export function define(model, source, vars){
  * @param callbackSuccess
  * @param callbackError
  */
-async function request(route){
+async function request(route, method, data) {
+    if (method)
+        return await axios[method](route, data, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
     return await axios.get(route);
 }
 
-export default request
+export default request;

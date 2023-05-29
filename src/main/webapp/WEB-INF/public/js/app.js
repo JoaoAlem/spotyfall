@@ -1,5 +1,5 @@
 // realizando o import do models e utils
-import { userModel } from './models.js'
+import { userModel, albumModel } from './models.js'
 import request from './utils.js'
 
 // Criação dos componentes com conteúdo
@@ -11,6 +11,8 @@ const playlistsView = () => import('../views/playlists-view.js')
 const privacy = () => import('../views/privacy.js')
 const technologies = () => import('../views/technologies.js')
 const user = () => import('../views/user.js')
+const login = () => import('../views/login.js')
+const signin = () => import('../views/signin.js')
 
 
 // Criação das rotas do router
@@ -24,6 +26,8 @@ const routes =[
     { path: "/technologies", name: "used technologies", component: technologies},
     { path: "/privacy", name: "privacy", component: privacy},
     { path: "/user", name: "user page", component: user},
+    { path: "/login", name: "login", component: login},
+    { path: "/signin", name: "create account", component: signin},
 ]
 
 // Criação do Router
@@ -43,14 +47,17 @@ const app = Vue.createApp({
         }
     },
     methods:{
-        fetchUser: async () => {
-            const response = await request("userController");
-            const user = new userModel(response.data);
-            return user;
+        request(route, method, data){
+           return request(route, method, data)
+        },
+        UserModel(data){
+            return new userModel(data)
+        },
+        AlbunsModel(data){
+            return new albumModel(data)
         }
     },
     async mounted(){
-        this.user = await this.fetchUser()
         this.loading = false
     }
 })

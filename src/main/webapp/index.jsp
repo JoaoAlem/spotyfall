@@ -39,14 +39,14 @@
         <!-- Usuarios container -->
         <div class="mt-auto mb-28 md:mb-16 w-40">
             <!-- Login -->
-            <router-link v-if="user?.id" to="/user" class="flex m-auto items-center space-x-3 w-28" >
+            <router-link v-if="user" to="/user" class="flex m-auto items-center space-x-3 w-28" >
                 <i class="fa-solid fa-user h-6" :style="{color: iconsColor}"></i>
-                <p class="text-white text-xl">{{user.name}}</p>
+                <p class="text-white text-xl">{{user.name}} {{user.surname}}</p>
             </router-link>
-            <a v-else href="${pageContext.request.contextPath}/login.jsp" class="flex m-auto items-center space-x-3 w-28" >
+            <router-link v-else to="/login" class="flex m-auto items-center space-x-3 w-28" >
                 <i class="fa-solid fa-user h-6" :style="{color: iconsColor}"></i>
-                <p class="text-white text-xl">Log in</p>
-            </a>
+                <p class="text-white text-xl">Login</p>
+            </router-link>
         </div>
     </nav>
     <!-- Fim navbar -->
