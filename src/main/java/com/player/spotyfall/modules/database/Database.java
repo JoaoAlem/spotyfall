@@ -1,11 +1,14 @@
 package com.player.spotyfall.modules.database;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.player.spotyfall.modules.Utils;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Database {
@@ -25,12 +28,38 @@ public class Database {
         this.conn = _Connection.connect();
         this.table = tableName;
 
-        this._whereConditions = new ArrayList<>();
         this._columns = new String[]{"*"};
+
+        this._whereConditions = new ArrayList<>();
         this._query = "";
         this._filters = new ArrayList<>();
     }
 
+    /** Método para limpar a query
+     *
+     */
+    public void Clear(){
+        this._whereConditions = new ArrayList<>();
+        this._query = "";
+        this._filters = new ArrayList<>();
+    }
+
+
+    /** método para fechar a conexão
+     *
+     * @throws SQLException
+     */
+    public void CloseConnection() throws SQLException {
+        this.conn.close();
+    }
+
+    /** Método que limpa e fecha a conexão
+     *
+     */
+    public void Sanitize() throws SQLException {
+        Clear();
+        CloseConnection();
+    }
     /*
     ===============================================
                     FUNÇÕES GERAIS
@@ -49,7 +78,6 @@ public class Database {
 
     /** Função que vai executar a query do banco de dados, ainda somente selects
      *
-     * @return ResultSet com oque foi encontrado do banco de dados
      * @throws SQLException um erro do SQL
      */
     private void executeUpdate() throws SQLException {
@@ -209,11 +237,11 @@ public class Database {
      * @return ResultSet com os dados consultados
      * @throws SQLException
      */
-    public ResultSet Select() throws SQLException {
+    public String Select() throws SQLException, JsonProcessingException {
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
         this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${where}");
 
-        return execute();
+        return _Select();
     }
 
     /** Função que executa um Select e retorna um ResultSet com somente 1 resultado
@@ -221,11 +249,43 @@ public class Database {
      * @return ResultSet com os dados consultados
      * @throws SQLException
      */
-    public ResultSet SelectFirst() throws SQLException {
+    public String SelectFirst() throws SQLException, JsonProcessingException {
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
         this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${where} LIMIT 1");
 
-        return execute();
+        return _Select();
+    }
+
+    /** Método que executa um select e retorna em json
+     *
+     * @return
+     * @throws SQLException
+     * @throws JsonProcessingException
+     */
+    private String _Select() throws SQLException, JsonProcessingException {
+        ResultSet rs = execute();
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        while (rs.next()) {
+            Map<String, Object> row = new HashMap<>();
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnName(i);
+                Object columnValue = rs.getObject(i);
+                row.put(columnName, columnValue);
+            }
+            resultList.add(row);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        if (resultList.isEmpty()) {
+            return "[]";
+        } else {
+            return objectMapper.writeValueAsString(resultList);
+        }
     }
 
     /*

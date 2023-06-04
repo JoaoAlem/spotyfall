@@ -22,74 +22,51 @@ public class userController extends HttpServlet {
 
     // Objetos de acesso
     UserModel user = new UserModel();
-    UserMethods methods = new UserMethods();
+    UserMethods methods;
     ResultSet rs;
     ObjectMapper objectMapper;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        objectMapper = new ObjectMapper();
+        methods = new UserMethods();
         try {
-            objectMapper = new ObjectMapper();
             Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
 
             String username = (String) payloadMap.get("username");
             String password = (String) payloadMap.get("password");
 
             /* Recolhendo os dados do banco de dados */
-            rs = methods.GetUser(username, password);
+            String result = methods.GetUser(username, password);
 
-            // se não existir dados, então retorna um eror
-            if(rs == null || !rs.next()){
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-
-                String errorMessage = "User not found.";
-                String errorJson = "{\"error\":\"" + errorMessage + "\"}";
-                resp.getWriter().write(errorJson);
-            }else{
-                user.setId(rs.getInt("id"));
-                user.setName(rs.getString("name"));
-                user.setSurname(rs.getString("surname"));
-                user.setUsername(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-                user.setPhone(rs.getString("phone"));
-                user.setUserImage(rs.getString("userImage"));
-
-                // Criando um objectMapper do Jackson e transformando em um JSON
-                objectMapper = new ObjectMapper();
-                String jsonString = objectMapper.writeValueAsString(user);
-
-                // Retornando o conteúdo
-                resp.setContentType("application/json");
-                resp.setCharacterEncoding("UTF-8");
-                resp.getWriter().write(jsonString);
+            // Retornando o conteúdo
+            resp.setContentType("application/json");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().write(result);
             }
-
-            rs.close();
-        } catch (databaseFault | SQLException e) {
+        catch (databaseFault | SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        objectMapper = new ObjectMapper();
+        methods = new UserMethods();
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         try{
-            objectMapper = new ObjectMapper();
             Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
             methods.SaveUser(payloadMap);
 
             resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
 
             String successMessage = "User saved successfully";
             String successJson = "{\"message\":\"" + successMessage + "\"}";
             resp.getWriter().write(successJson);
         } catch (Exception e){
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
 
             String errorMessage = "Error occurred while saving user";
             String errorJson = "{\"error\":\"" + errorMessage + "\"}";
