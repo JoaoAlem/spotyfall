@@ -1,12 +1,12 @@
 package com.player.spotyfall.modules.custom;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.player.spotyfall.models.UserModel;
 import com.player.spotyfall.modules.Utils;
 import com.player.spotyfall.modules.database.Database;
 import com.player.spotyfall.modules.database.databaseFault;
 
-import java.sql.ResultSet;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -20,9 +20,11 @@ public class UserMethods extends UserModel
     public String GetUser(String login, String password) throws databaseFault, SQLException, JsonProcessingException {
         try{
             return userTable
-                    .Where("username", login)
+                    .WhereOr("username", login)
+                    .WhereOr("email", login)
+                    .Where("phone", login)
                     .Where("password", password)
-                    .Where("deleteDate is null")
+                    .WhereNull("deleteDate")
                     .SelectFirst();
         } finally {
             userTable.Sanitize();
@@ -47,5 +49,21 @@ public class UserMethods extends UserModel
         } finally {
             userTable.Sanitize();
         }
+    }
+
+    public static void main(String[] args) throws databaseFault, SQLException, JsonProcessingException {
+        UserMethods methods = new UserMethods();
+        String login = "joao.aalem@gmail.com";
+        String password = "123456";
+
+        String teste = methods.userTable
+                .WhereOr("username", login)
+                .WhereOr("email", login)
+                .Where("phone", login)
+                .Where("password", password)
+                .WhereNull("deleteDate")
+                .SelectFirst();
+
+        System.out.println(teste);
     }
 }
