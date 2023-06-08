@@ -14,6 +14,10 @@ const user = () => import('../views/user.js')
 const login = () => import('../views/login.js')
 const signin = () => import('../views/signin.js')
 
+/* criação dos componentes */
+
+const successComponent = () => import('../components/success.js')
+const errorComponent = () => import('../components/error.js')
 
 // Criação das rotas do router
 const routes =[
@@ -47,9 +51,12 @@ const app = Vue.createApp({
         }
     },
     methods:{
+        /* Utils */
         request(route, method, data){
            return request(route, method, data)
         },
+
+        /* Models */
         UserModel(data){
             return new userModel(data)
         },
@@ -63,3 +70,7 @@ const app = Vue.createApp({
 })
 .use(router)
 .mount("#main")
+
+app
+    .component("success", successComponent())
+    .component("error", errorComponent())
