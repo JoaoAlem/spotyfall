@@ -13,4 +13,16 @@ create table if not exists users(
     createDate datetime default now(),
     updateDate datetime default now() ON UPDATE now(),
     deleteDate datetime null
-)
+);
+
+CREATE TABLE playlists (
+    id INT NOT NULL AUTO_INCREMENT,
+    playlistName VARCHAR(50) NOT NULL,
+    playlistsImage VARCHAR(50) NOT NULL,
+    playlistsDescricao VARCHAR(50) NOT NULL,
+    createDate DATETIME NOT NULL DEFAULT NOW(),
+    updateDate DATETIME NOT NULL DEFAULT NOW() ON UPDATE now(),
+    deleteDate DATETIME NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE INDEX idplaylists_UNIQUE (id ASC) VISIBLE
+);
