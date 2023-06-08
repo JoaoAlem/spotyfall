@@ -50,20 +50,4 @@ public class UserMethods extends UserModel
             userTable.Sanitize();
         }
     }
-
-    public static void main(String[] args) throws databaseFault, SQLException, JsonProcessingException {
-        UserMethods methods = new UserMethods();
-        String login = "joao.aalem@gmail.com";
-        String password = "123456";
-
-        String teste = methods.userTable
-                .WhereOr("username", login)
-                .WhereOr("email", login)
-                .Where("phone", login)
-                .Where("password", password)
-                .WhereNull("deleteDate")
-                .SelectFirst();
-
-        System.out.println(teste);
-    }
 }
