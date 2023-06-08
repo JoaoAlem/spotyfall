@@ -6,16 +6,14 @@ import com.player.spotyfall.modules.Utils;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Database {
 
     /* Conexão do banco de dados */
     private Connection conn;
     private String table;
+    private String alias;
 
     /* Atributos do banco de dados */
     private ArrayList<String[]> _whereConditions;
@@ -35,31 +33,18 @@ public class Database {
         this._filters = new ArrayList<>();
     }
 
-    /** Método para limpar a query
-     *
-     */
-    public void Clear(){
+    public Database(String tableName, String alias) {
+        this.conn = _Connection.connect();
+        this.table = tableName;
+        this.alias = " AS " + alias;
+
+        this._columns = new String[]{"*"};
+
         this._whereConditions = new ArrayList<>();
         this._query = "";
         this._filters = new ArrayList<>();
     }
 
-
-    /** método para fechar a conexão
-     *
-     * @throws SQLException
-     */
-    public void CloseConnection() throws SQLException {
-        this.conn.close();
-    }
-
-    /** Método que limpa e fecha a conexão
-     *
-     */
-    public void Sanitize() throws SQLException {
-        Clear();
-        CloseConnection();
-    }
     /*
     ===============================================
                     FUNÇÕES GERAIS
@@ -95,6 +80,32 @@ public class Database {
         return this;
     }
 
+    /** Método para limpar a query
+     *
+     */
+    private void Clear(){
+        this._whereConditions = new ArrayList<>();
+        this._query = "";
+        this._filters = new ArrayList<>();
+    }
+
+
+    /** método para fechar a conexão
+     *
+     * @throws SQLException
+     */
+    private void CloseConnection() throws SQLException {
+        this.conn.close();
+    }
+
+    /** Método que limpa e fecha a conexão
+     *
+     */
+    public void Sanitize() throws SQLException {
+        Clear();
+        CloseConnection();
+    }
+
     /*
     ===============================================
                         WHERE
@@ -106,16 +117,24 @@ public class Database {
      * @return Instancia do objeto Database
      */
     private StringBuilder getWhere(){
+        String operator = "";
         StringBuilder whereConditionsBuilder = new StringBuilder();
         for (String[] condition : this._whereConditions) {
-            whereConditionsBuilder.append("(");
+            if(condition.length != 1) {
+                // definindo o operador e atualizando o condition atual
+                operator = condition[condition.length -1];
+                condition = Arrays.copyOf(condition, condition.length - 1);
+            }
+
+            whereConditionsBuilder.append(" (");
             whereConditionsBuilder.append(String.join(" ", condition));
-            whereConditionsBuilder.append(") AND ");
+            whereConditionsBuilder.append(") ");
+            whereConditionsBuilder.append(operator);
         }
 
         if (this._whereConditions.size() > 0) {
             whereConditionsBuilder.insert(0, "WHERE ");
-            whereConditionsBuilder.setLength(whereConditionsBuilder.length() - 5);
+            whereConditionsBuilder.setLength(whereConditionsBuilder.length() - operator.length());
         }
 
         return whereConditionsBuilder;
@@ -163,9 +182,11 @@ public class Database {
      * @throws databaseFault Pode retornar um erro de string vazia
      */
     public Database Where(String condition) throws databaseFault {
-        String[] item = new String[1];
-        if(Utils.validateString(condition))
+        String[] item = new String[2];
+        if(Utils.validateString(condition)) {
             item[0] = condition;
+            item[1] = "AND";
+        }
         else
             throw new databaseFault("Fill the fields");
 
@@ -180,11 +201,12 @@ public class Database {
      * @throws databaseFault Pode retornar um erro de string vazia
      */
     public Database Where(String column, String value) throws databaseFault {
-        String[] item = new String[3];
+        String[] item = new String[4];
         if(Utils.validateString(column) && Utils.validateString(value)){
             item[0] = column;
             item[1] = "=";
             item[2] = '"' + value + '"';
+            item[3] = "AND";
         }else{
             throw new databaseFault("Fill the fields");
         }
@@ -201,17 +223,39 @@ public class Database {
      * @throws databaseFault Pode retornar um erro de string vazia
      */
     public Database Where(String column, String operator, String value) throws databaseFault {
-        String[] item = new String[3];
+        String[] item = new String[4];
 
         if(Utils.validateString(column) && Utils.validateString(operator) && Utils.validateString(value)){
             item[0] = column;
             item[1] = operator;
             item[2] = '"' + value + '"';
+            item[3] = "AND";
         }
 
         return setWhere(item);
     }
 
+
+    /** Executa um where com a condição or
+     *
+     * @param column
+     * @param value
+     * @return
+     * @throws databaseFault
+     */
+    public Database WhereOr(String column, String value) throws databaseFault {
+        String[] item = new String[4];
+        if(Utils.validateString(column) && Utils.validateString(value)){
+            item[0] = column;
+            item[1] = "=";
+            item[2] = '"' + value + '"';
+            item[3] = "OR";
+        }else{
+            throw new databaseFault("Fill the fields");
+        }
+
+        return setWhere(item);
+    }
     /*
     ===============================================
                         SELECT
@@ -228,6 +272,7 @@ public class Database {
         _query.put("columns", String.join(", ", this._columns));
         _query.put("where", this.getWhere().toString());
         _query.put("table", this.table);
+        _query.put("alias", this.alias);
 
         return _query;
     }
@@ -239,7 +284,7 @@ public class Database {
      */
     public String Select() throws SQLException, JsonProcessingException {
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
-        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${where}");
+        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${alias} ${where}");
 
         return _Select();
     }
