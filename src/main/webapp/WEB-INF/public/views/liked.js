@@ -7,7 +7,7 @@ export default {
                 </div>
                 <div class="mx-auto my-auto md:ml-3 md:mr-auto text-white flex flex-col">
                     <h2 class="font-bold text-md xs:text-xl sm:text-2xl">Músicas curtidas</h2>
-                    <span class="font-medium text-sm xs:text-md sm:text-lg">{{$root.user.name}} {{$root.user.surname}}</span>
+                    <span class="font-medium text-sm xs:text-md sm:text-lg"></span>
                     <span class="text-sm sm:text-md">quantidade de músicas</span>
                 </div>
                 <div class="mx-auto my-auto space-x-10 flex">
