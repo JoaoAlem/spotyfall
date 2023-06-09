@@ -128,4 +128,7 @@
 </div>
 <!-- Fim container geral player-->
 
+<success/>
+<error/>
+
 <jsp:include page="foot.jsp" />
