@@ -9,10 +9,21 @@ create table if not exists users(
     email varchar(255) not null unique,
     phone varchar(11) not null unique,
     password varchar(30) not null,
-    userImage varchar(50) null default 'placeholder.webp',
+    userImage varchar(50) null default 'userPlaceholder.webp',
     createDate datetime default now(),
     updateDate datetime default now() ON UPDATE now(),
     deleteDate datetime null
+);
+
+create table albumns (
+    id int not null auto_increment,
+    albumName varchar(50) not null,
+    albumImage varchar(50) null default 'albumPlaceholder.webp',
+    tipo enum('single', 'album') not null,
+    createDate datetime default now(),
+    updateDate datetime default now() ON UPDATE now(),
+    deleteDate datetime null,
+    primary key (id)
 );
 
 CREATE TABLE playlists (
@@ -24,5 +35,4 @@ CREATE TABLE playlists (
     updateDate DATETIME NOT NULL DEFAULT NOW() ON UPDATE now(),
     deleteDate DATETIME NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE INDEX idplaylists_UNIQUE (id ASC) VISIBLE
-);
+    );
