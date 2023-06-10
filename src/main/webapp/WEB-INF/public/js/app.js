@@ -48,13 +48,38 @@ const app = Vue.createApp({
         return {
             iconsColor: "#f6f6f6",
             user: null,
-            loading: true
+            loading: true,
+            message: null,
+            successComponent: null,
+            errorComponent: null
         }
     },
     methods:{
         /* Utils */
         request(route, method, data){
            return request(route, method, data)
+        },
+        setMessage(message){
+            this.message = message
+        },
+        hideModal(component, time){
+            setTimeout(() => {
+                component.classList.remove("show")
+                component.classList.remove("shake")
+            }, time)
+        },
+        showSuccess(message){
+            this.setMessage(message)
+            this.successComponent.classList.add("show")
+
+            this.hideModal(this.successComponent, 5000)
+        },
+        showError(message){
+            this.setMessage(message)
+            this.errorComponent.classList.add("show")
+            this.errorComponent.classList.add("shake")
+
+            this.hideModal(this.errorComponent, 5000)
         },
 
         /* Models */
@@ -65,11 +90,16 @@ const app = Vue.createApp({
             return new albumModel(data)
         }
     },
-    async mounted(){
+    mounted(){
         this.loading = false
+        this.successComponent = document.getElementById("balaoSucesso")
+        this.errorComponent = document.getElementById("balaoErro")
     }
 })
-.use(router)
-.component("success", success)
-.component("error", error)
-.mount("#main")
+
+app.use(router)
+app
+    .component("success", success)
+    .component("error", error)
+
+app.mount("#main")
