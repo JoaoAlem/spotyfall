@@ -127,8 +127,9 @@
     </div>
 </div>
 <!-- Fim container geral player-->
-
-<success/>
-<error/>
+<div>
+    <success></success>
+    <error></error>
+</div>
 
 <jsp:include page="foot.jsp" />
