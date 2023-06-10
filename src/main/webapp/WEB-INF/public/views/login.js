@@ -10,7 +10,7 @@ export default {
                         <div class="items-center h-max p-4 space-y-5">
                             <!-- input senha e nome -->
                             <div class="flex flex-col space-y-4">
-                                <input v-model="editing.login" type="text" class="w-40 sm:w-full h-12 bg-transparent border-2 border-[#45f3ff]  rounded-md text-base tracking-tighter text-[#f6f6f6]" placeholder="Username"  required>
+                                <input v-model="editing.login" type="text" class="w-40 sm:w-full h-12 bg-transparent border-2 border-[#45f3ff]  rounded-md text-base tracking-tighter text-[#f6f6f6]" placeholder="E-mail, username or phone"  required>
                                 <input v-model="editing.password" type="password" class="w-40 sm:w-full h-12 bg-transparent border-2 border-[#45f3ff] rounded-md text-base tracking-tighter text-[#f6f6f6]" placeholder="Senha" required>
                             </div>
         
@@ -51,11 +51,15 @@ export default {
 
             this.$root.request("userController", "post", data)
                 .then((response) =>{
-                    if(response.data)
-                        this.$root.user = this.$root.UserModel(response.data)
+                    const [ user ] = response.data
+
+                    if(user.id_user) {
+                        this.$root.user = this.$root.UserModel(user)
+                        this.$root.showSuccess(user)
+                    }
                 })
-                .catch((error) =>{
-                    console.error(error)
+                .catch(() =>{
+                    this.$root.showError("Nome ou senha incorretos")
                 })
         }
     }

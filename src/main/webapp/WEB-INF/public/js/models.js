@@ -3,7 +3,7 @@ export class userModel {
     constructor(i){
         define(this, i,
         {
-                id: null,
+                id_user: null,
                 name: null,
                 surname: null,
                 username: null,
