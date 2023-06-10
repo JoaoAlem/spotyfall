@@ -89,3 +89,8 @@
 .balao i {
     margin-right: 5px;
 }
+
+.balao.show{
+    opacity: 1 !important;
+    display: block !important;
+}
