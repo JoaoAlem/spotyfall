@@ -2,10 +2,6 @@ export default {
     template: `
     <template v-if="$root.user">
         <div>
-            <input type="file" name="file" id="file">
-            <imput for="input-search"><i style="color:#f6f6f6" class="w-6 fas fa-search"></i></imput>
-            <button class="w-6 fas fa-search" name="submit">Upload File</button> 
-        
             <div class="w-fit mx-auto sm:w-full h-fit card-borders p-0.5 rounded-3xl mb-10">
                 <div class="p-3 sm:p-0 bg-padrao flex flex-col sm:flex-row h-44 items-center rounded-3xl">
                     <div class="w-fit my-auto mr-4 sm:h-3/4 ml-7">
@@ -73,11 +69,9 @@ export default {
             modal.classList.add("flex")
             modal.classList.add("flex-col")
             modal.classList.remove("hidden")
-
-            console.log(item)
         },
         delete(item){
-            console.log(item)
+
         },
 
     },

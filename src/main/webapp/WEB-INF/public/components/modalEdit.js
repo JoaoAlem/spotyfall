@@ -19,6 +19,11 @@ export default {
                 <input id="form-title" type="text">
             </div>
             
+            <input type="file" name="file" id="file">
+            <imput for="input-search"><i style="color:#f6f6f6" class="w-6 fas fa-search"></i></imput>
+            <button class="w-6 fas fa-search" name="submit">Upload File</button> 
+            
+            
             <!-- Form footer -->
             <div class="flex flex-row">
                 <button @click="this.$root.closeModal('modal-edit')" class="w-10 h-7 bg-gray-500"><i class="fa fa-close"></i></button>
