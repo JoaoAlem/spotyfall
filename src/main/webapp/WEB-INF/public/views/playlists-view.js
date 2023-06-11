@@ -1,6 +1,7 @@
 export default {
     template: `
-         <div class="w-fit mx-auto sm:w-full h-full card-borders p-0.5 rounded-3xl">
+    <template v-if="$root.user">
+        <div class="w-fit mx-auto sm:w-full h-full card-borders p-0.5 rounded-3xl">
             <div class="p-3 sm:p-0 bg-padrao flex flex-col sm:flex-row h-full items-center rounded-3xl">
                 <div class="w-fit my-auto mr-4 sm:h-3/4 ml-7">
                     <img class="border rounded-3xl h-full" src="../public/images/images.png" alt=""/>
@@ -44,14 +45,17 @@ export default {
                 </div>
             </template>
         </div>
+    </template>
+         
     `,
-
     data(){
         return{
             placeholderURL: null
         }
     },
     created(){
+        if(!this.$root.user)
+           return this.$root.$router.replace("/login")
         this.placeholderURL = `../public/images/placeholder.png`
     }
 }
