@@ -94,3 +94,9 @@
     opacity: 1 !important;
     display: block !important;
 }
+
+/* Menu */
+#menu > ul.show{
+    display: flex;
+    flex-direction: column;
+}
