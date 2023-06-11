@@ -57,28 +57,19 @@ CREATE TABLE IF NOT EXISTS playlists
 
 CREATE TABLE IF NOT EXISTS musics
 (
-    id_music   INT AUTO_INCREMENT PRIMARY KEY,
+    id_music   INT AUTO_INCREMENT,
+    id_album   INT,
     musicName  VARCHAR(50) NOT NULL,
     musicImage VARCHAR(70) NULL,
     createDate DATETIME DEFAULT NOW(),
     updateDate DATETIME DEFAULT NOW() ON UPDATE NOW(),
-    deleteDate DATETIME    NULL
+    deleteDate DATETIME    NULL,
+    PRIMARY KEY (id_music, id_album),
+    FOREIGN KEY (id_album) REFERENCES albums (id_album)
 );
 
 
 /* Tabelas de relacionamentos */
--- Musicas de um album
-CREATE TABLE IF NOT EXISTS albumMusics
-(
-    id_album   INT      NOT NULL,
-    id_music   INT      NOT NULL,
-    createDate DATETIME DEFAULT NOW(),
-    deleteDate DATETIME NULL,
-    PRIMARY KEY (id_album, id_music),
-    FOREIGN KEY (id_album) REFERENCES albums (id_album),
-    FOREIGN KEY (id_music) REFERENCES musics (id_music)
-);
-
 -- Musicas de uma playlist
 CREATE TABLE IF NOT EXISTS playlistMusics
 (
