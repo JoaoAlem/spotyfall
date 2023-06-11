@@ -14,23 +14,29 @@ const user = () => import('../views/user.js')
 const login = () => import('../views/login.js')
 const signin = () => import('../views/signin.js')
 
+// Criação das páginas de gerenciamento
+const manageMusics = () => import('../views/manageMusics.js')
+
 /* criação dos componentes */
 import success from "../components/success.js";
 import error from "../components/error.js";
+import appMenu from "../components/appMenu.js";
+import modalEdit from "../components/modalEdit.js";
 
 // Criação das rotas do router
 const routes = [
     { path: '/', redirect: "/home" },
     { path: '/home', name: "home", component: home },
     { path: "/search", name: "search", component: search },
-    { path: '/liked', name: "liked", component: liked, meta: { requiresUser: true }  },
+    { path: '/liked', name: "liked", component: liked },
     { path: "/artists", name: "artists", component: artists },
-    { path: "/playlists-view/:id", name: "view playlist", component: playlistsView, meta: { requiresUser: true } },
+    { path: "/playlists-view/:id", name: "view playlist", component: playlistsView },
     { path: "/technologies", name: "used technologies", component: technologies },
     { path: "/privacy", name: "privacy", component: privacy },
-    { path: "/user", name: "user page", component: user, meta: { requiresUser: true } },
+    { path: "/user", name: "user page", component: user },
     { path: "/login", name: "login", component: login },
     { path: "/signin", name: "create account", component: signin },
+    { path: "/musics-management", name: "Manage musics", component: manageMusics },
 ]
 
 // Criação do Router
@@ -79,6 +85,18 @@ const app = Vue.createApp({
 
             this.hideModal(this.errorComponent, 5000)
         },
+        openModal(item, id){
+            let modal = document.getElementById(id)
+            modal.classList.add("flex")
+            modal.classList.add("flex-col")
+            modal.classList.remove("hidden")
+        },
+        closeModal(id){
+            let modal = document.getElementById(id)
+            modal.classList.remove("flex")
+            modal.classList.remove("flex-col")
+            modal.classList.add("hidden")
+        },
 
         /* Models */
         UserModel(data) {
@@ -95,23 +113,12 @@ const app = Vue.createApp({
     }
 })
 
-// Navigation guard to check if user exists before accessing the "user" page
-router.beforeEach((to, from, next) => {
-    if (to.meta.requiresUser) {
-        const user = app.user;
-        if (!user || !user.id_user) {
-            next('/login');
-        } else {
-            next();
-        }
-    } else {
-        next();
-    }
-})
-
 app.use(router)
+
 app
     .component("success", success)
     .component("error", error)
+    .component("app-menu", appMenu)
+    .component("modal-edit", modalEdit)
 
 app.mount("#main")
