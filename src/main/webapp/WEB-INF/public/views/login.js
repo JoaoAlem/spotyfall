@@ -43,6 +43,14 @@ export default {
             }
         }
     },
+    beforeRouteUpdate(to, from){
+        if(typeof this.$root.user !== "undefined" && this.$root.user.id_user){
+            this.$root.$router.replace("/user")
+            return false
+        }
+
+        return true
+    },
     methods:{
         Login(){
             let data = new FormData()
@@ -55,7 +63,7 @@ export default {
 
                     if(user.id_user) {
                         this.$root.user = this.$root.UserModel(user)
-                        this.$root.showSuccess(user)
+                        this.$root.showSuccess("Logado com sucesso")
                     }
                 })
                 .catch(() =>{

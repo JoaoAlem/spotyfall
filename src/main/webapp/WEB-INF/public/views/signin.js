@@ -37,6 +37,14 @@ export default {
             confirmPassword: null
         }
     },
+    beforeRouteUpdate(to, from){
+        if(this.$root.user.id_user){
+            this.$root.$router.replace("/user")
+            return false
+        }
+
+        return true
+    },
     methods: {
         Save(){
             if(this.user.password !== this.confirmPassword)
