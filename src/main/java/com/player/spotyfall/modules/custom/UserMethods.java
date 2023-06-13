@@ -14,7 +14,7 @@ public class UserMethods extends UserModel
 {
     private final Database userTable;
     public UserMethods(){
-        userTable = users();
+        userTable = _users();
     }
 
     public String GetUser(String login, String password) throws databaseFault, SQLException, JsonProcessingException {

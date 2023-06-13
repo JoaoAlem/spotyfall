@@ -9,7 +9,7 @@ public class UserModel {
     private final String[] colunas_following = new String[]{"id_artist", "id_user"};
 
     /* Metodos do banco de dados */
-    public Database users(){
+    public Database _users(){
         return new Database("users").Columns(colunas_user);
     }
 
