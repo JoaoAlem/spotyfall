@@ -5,36 +5,32 @@ import java.io.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 
-import com.player.spotyfall.models.UserModel;
 import com.player.spotyfall.modules.custom.UserMethods;
 import com.player.spotyfall.modules.database.databaseFault;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 @WebServlet(name = "userController", value = "/userController")
-public class userController extends HttpServlet {
+@MultipartConfig
+public class UserController extends HttpServlet {
 
     // Objetos de acesso
-    UserModel user = new UserModel();
     UserMethods methods;
-    ResultSet rs;
     ObjectMapper objectMapper;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        objectMapper = new ObjectMapper();
         methods = new UserMethods();
         try {
-            Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
 
-            String username = (String) payloadMap.get("username");
-            String password = (String) payloadMap.get("password");
+            String username = req.getParameter("username");
+            String password = req.getParameter("password");
 
             /* Recolhendo os dados do banco de dados */
             String result = methods.GetUser(username, password);
@@ -57,7 +53,16 @@ public class userController extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         try{
-            Map<String, Object> payloadMap = objectMapper.readValue(req.getReader(), new TypeReference<>() {});
+            Map<String, Object> payloadMap = new HashMap<>();
+
+            Enumeration<String> parameterNames = req.getParameterNames();
+            while (parameterNames.hasMoreElements()) {
+                String paramName = parameterNames.nextElement();
+                String paramValue = req.getParameter(paramName);
+
+                payloadMap.put(paramName, paramValue);
+            }
+
             methods.SaveUser(payloadMap);
 
             resp.setStatus(HttpServletResponse.SC_OK);
