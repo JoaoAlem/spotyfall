@@ -16,12 +16,15 @@ const signin = () => import('../views/signin.js')
 
 // Criação das páginas de gerenciamento
 const manageMusics = () => import('../views/manageMusics.js')
+const manageAlbums = () => import('../views/manageAlbums.js')
 
 /* criação dos componentes */
 import success from "../components/success.js";
 import error from "../components/error.js";
 import appMenu from "../components/appMenu.js";
-import modalEdit from "../components/modalEdit.js";
+import modalEditMusics from "../components/editMusicsModal.js";
+import modalEditAlbums from "../components/editAlbumsModal.js";
+
 
 // Criação das rotas do router
 const routes = [
@@ -37,6 +40,7 @@ const routes = [
     { path: "/login", name: "login", component: login },
     { path: "/signin", name: "create account", component: signin },
     { path: "/musics-management", name: "Manage musics", component: manageMusics },
+    { path: "/albumns-management", name: "Manage Albumns", component: manageAlbums },
 ]
 
 // Criação do Router
@@ -85,7 +89,7 @@ const app = Vue.createApp({
 
             this.hideModal(this.errorComponent, 5000)
         },
-        openModal(item, id){
+        openModal(id){
             let modal = document.getElementById(id)
             modal.classList.add("flex")
             modal.classList.add("flex-col")
@@ -119,6 +123,7 @@ app
     .component("success", success)
     .component("error", error)
     .component("app-menu", appMenu)
-    .component("modal-edit", modalEdit)
+    .component("edit-musics", modalEditMusics)
+    .component("edit-albums", modalEditAlbums)
 
 app.mount("#main")
