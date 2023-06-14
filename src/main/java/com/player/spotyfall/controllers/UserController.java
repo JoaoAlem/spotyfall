@@ -2,7 +2,6 @@ package com.player.spotyfall.controllers;
 
 import java.io.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.SQLException;
