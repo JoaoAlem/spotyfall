@@ -44,7 +44,7 @@ export default {
         }
     },
     beforeRouteUpdate(to, from){
-        if(typeof this.$root.user !== "undefined" && this.$root.user.id_user){
+        if(typeof this.$root.user !== "undefined"){
             this.$root.$router.replace("/user")
             return false
         }
