@@ -3,7 +3,7 @@ export class userModel {
     constructor(i){
         define(this, i,
         {
-                id: null,
+                id_user: null,
                 name: null,
                 surname: null,
                 username: null,
@@ -43,13 +43,12 @@ export class playlistModel {
 export class albumModel {
     constructor(i){
         define(this, i, {
-            id: null,
+            id_album: null,
             albumName: null,
             albumImage: null,
-            creationDate: null,
-            idArtist: null,
-            idUser: null,
             tipo: null,
+            creationDate: null,
+            id_artist: null,
         })
     }
 }

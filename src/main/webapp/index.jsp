@@ -52,11 +52,18 @@
     <!-- Fim navbar -->
 
     <!-- container conteúdo dinâmico e navegação -->
-    <div class="w-full h-full flex flex-col">
-        <div class="w-40 h-7 p-1 space-x-2 m-2">
-            <button class="mx-auto" @click="this.$router.go(-1)"><i class="h-6 fa-solid fa-chevron-circle-left" :style="{color: iconsColor}"></i></button>
-            <button class="mx-auto" @click="this.$router.go(1)"><i class="h-6  fa-solid fa-chevron-circle-right" :style="{color: iconsColor}"></i></button>
+    <div class="w-full h-full flex flex-col pt-2">
+        <div class="flex justify-between w-11/12">
+            <!-- Navegação -->
+            <div class="w-40 h-7 p-1 space-x-2 m-2">
+                <button class="mx-auto" @click="this.$router.go(-1)"><i class="h-6 fa-solid fa-chevron-circle-left" :style="{color: iconsColor}"></i></button>
+                <button class="mx-auto" @click="this.$router.go(1)"><i class="h-6  fa-solid fa-chevron-circle-right" :style="{color: iconsColor}"></i></button>
+            </div>
+
+            <!-- Menu -->
+           <app-menu></app-menu>
         </div>
+
         <!-- Coloque o conteúdo dinâmico dentro de main -->
         <main id='appConteudo' class="max-h-fit h-full flex flex-col space-y-10 p-7 basis-full shrink overflow-y-auto">
             <router-view></router-view>
@@ -127,5 +134,9 @@
     </div>
 </div>
 <!-- Fim container geral player-->
+<div>
+    <success></success>
+    <error></error>
+</div>
 
 <jsp:include page="foot.jsp" />

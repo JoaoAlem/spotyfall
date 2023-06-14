@@ -32,7 +32,7 @@ async function request(route, method, data) {
     if (method)
         return await axios[method](route, data, {
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "multipart/form-data"
             }
         });
 

@@ -37,6 +37,14 @@ export default {
             confirmPassword: null
         }
     },
+    beforeRouteUpdate(to, from){
+        if(this.$root.user.id_user){
+            this.$root.$router.replace("/user")
+            return false
+        }
+
+        return true
+    },
     methods: {
         Save(){
             if(this.user.password !== this.confirmPassword)
@@ -52,6 +60,13 @@ export default {
             data.append("password", this.user.password)
 
             this.$root.request("userController", "put", data)
+                .then(() => {
+                    this.$root.showSuccess("Usuário cadastrado com sucesso!")
+                    this.$root.$router.replace("/login")
+                })
+                .catch((error) => {
+                    this.$root.showError("Não foi possivel cadastrar o usuário: " + error)
+                })
         }
     }
 }
