@@ -70,17 +70,16 @@ export default {
                 data.append("albumImage", this.selectedFile)
             }
 
-
             this.$root.request("albumController", "put", data)
                 .then((response) => {
                     this.$root.closeModal("modal-edit")
                     this.$root.showSuccess("Album cadastrado")
 
                     // Limpar
-                    this.album = this.$root.AlbunsModel()
-                    this.selectedFile = null
+                    //this.album = Object.assign({}, this.$root.AlbunsModel())
+                    //this.selectedFile = null
                 })
-                .catch(() => this.$root.showError("Não foi possivel cadastrar o album, tente novamente mais tarde"))
+                .catch((erro) => this.$root.showError("Não foi possivel cadastrar o album, tente novamente mais tarde" + erro))
         }
     }
 }
