@@ -371,7 +371,7 @@ public class Database {
             String columnName = entry.getKey();
             Object columnValue = entry.getValue();
 
-            if (!columnValue.equals("null") && Utils.validateString(columnValue.toString())) {
+            if (Utils.validateString(columnValue.toString())) {
                 if (columnCount > 0) {
                     this._saveColumns += ", ";
                     this._values += ", ";
