@@ -13,7 +13,7 @@ export default {
                 <ul class="w-full h-full" :class="{ show: isMenuActive, hidden: !isMenuActive }">
                     <li class=""><router-link to="/musics-management">Gerenciar Músicas</router-link></li>        
                     <li class=""><router-link to="/musics-management">Gerenciar Playlists</router-link></li>                  
-                    <li class=""><router-link to="/musics-management">Gerenciar Albuns</router-link></li>                  
+                    <li class=""><router-link to="/albumns-management">Gerenciar Albuns</router-link></li>                  
           
                     <button @click="logout" class="border-none">Logout</button>
                 </ul>
