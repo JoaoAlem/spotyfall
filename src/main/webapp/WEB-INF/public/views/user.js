@@ -10,15 +10,15 @@ export default {
                     <div style="margin-block: auto !important;">
                         <div class="text-start space-y-1">
                             <label for="name-user">Nome</label>
-                            <input :value="$root.user.name + ' ' + $root.user.surname" class="bg-[#bbacf5] border-none rounded-2xl w-full h-10" id="name-user" type="text"/>
+                            <input :value="$root.user.name + ' ' + $root.user.surname" class="bg-[#bbacf5] border-none p-2 rounded-2xl w-full h-10 text-black" id="name-user" type="text" disabled/>
                         </div>
                         <div class="text-start space-y-1">
                             <label for="phone-user">Telefone</label>
-                           <input v-model="$root.user.phone" class="bg-[#bbacf5] border-none rounded-2xl w-full h-10" id="phone-user" type="text"/>
+                           <input v-model="$root.user.phone" class="bg-[#bbacf5] border-none p-2 rounded-2xl w-full h-10 text-black" id="phone-user" type="text" disabled/>
                         </div>
                         <div class="text-start space-y-1">
                             <label for="email-user">E-mail</label>
-                            <input class="bg-[#bbacf5] border-none rounded-2xl w-full h-10" id="email-user" type="text"/>
+                            <input v-model="$root.user.email" class="bg-[#bbacf5] border-none p-2 rounded-2xl w-full h-10 text-black" id="email-user" type="text" disabled/>
                         </div>
                     </div>
                     <p>Caso queira saber mais sobre nós, leia as 
@@ -46,5 +46,8 @@ export default {
     created() {
         if(!this.$root.user)
             this.$root.$router.replace("/login")
+    },
+    mounted(){
+
     }
 }
