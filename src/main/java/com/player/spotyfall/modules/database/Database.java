@@ -2,10 +2,12 @@ package com.player.spotyfall.modules.database;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.player.spotyfall.modules.Utils;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Database {
@@ -17,20 +19,26 @@ public class Database {
 
     /* Atributos do banco de dados */
     private ArrayList<String[]> _whereConditions;
+    private ArrayList<String[]> _joinConditions;
     private String[] _columns;
     private String _query;
-    private ArrayList<String[]> _filters;
+    private String _saveColumns;
+    private String _values;
+
 
     /* Quando chamar o objeto, passar o nome da tabela */
     public Database(String tableName) {
         this.conn = _Connection.connect();
         this.table = tableName;
+        this.alias = "";
 
         this._columns = new String[]{"*"};
 
+        this._joinConditions = new ArrayList<>();
         this._whereConditions = new ArrayList<>();
         this._query = "";
-        this._filters = new ArrayList<>();
+        this._saveColumns = "";
+        this._values = "";
     }
 
     public Database(String tableName, String alias) {
@@ -40,9 +48,9 @@ public class Database {
 
         this._columns = new String[]{"*"};
 
+        this._joinConditions = new ArrayList<>();
         this._whereConditions = new ArrayList<>();
         this._query = "";
-        this._filters = new ArrayList<>();
     }
 
     /*
@@ -80,6 +88,13 @@ public class Database {
         ps.executeUpdate();
     }
 
+    /** returns the tableName
+     *
+     * @return table name
+     */
+    private String getTable(){
+        return this.table;
+    }
     /**
      * Define as colunas desejadas para o objeto do banco de dados
      *
@@ -95,11 +110,12 @@ public class Database {
      * Método para limpar a query
      */
     private void Clear() {
+        this._joinConditions = new ArrayList<>();
         this._whereConditions = new ArrayList<>();
         this._query = "";
-        this._filters = new ArrayList<>();
+        this._values = "";
+        this._saveColumns = "";
     }
-
 
     /**
      * método para fechar a conexão
@@ -134,6 +150,7 @@ public class Database {
         StringBuilder whereConditionsBuilder = new StringBuilder();
         for (String[] condition : this._whereConditions) {
             if (condition.length != 1) {
+
                 // definindo o operador e atualizando o condition atual
                 operator = condition[condition.length - 1];
                 condition = Arrays.copyOf(condition, condition.length - 1);
@@ -291,9 +308,10 @@ public class Database {
     private Map<String, String> SelectMap() {
         Map<String, String> _query = new HashMap<>();
         _query.put("columns", String.join(", ", this._columns));
-        _query.put("where", this.getWhere().toString());
         _query.put("table", this.table);
         _query.put("alias", this.alias);
+        _query.put("joins", this.getJoins().toString());
+        _query.put("where", this.getWhere().toString());
 
         return _query;
     }
@@ -306,7 +324,7 @@ public class Database {
      */
     public String Select() throws SQLException, JsonProcessingException {
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
-        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${alias} ${where}");
+        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${alias} ${joins} ${where}");
 
         return _Select();
     }
@@ -319,7 +337,7 @@ public class Database {
      */
     public String SelectFirst() throws SQLException, JsonProcessingException {
         StringSubstitutor substitutor = new StringSubstitutor(SelectMap());
-        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${where} LIMIT 1");
+        this._query = substitutor.replace("SELECT ${columns} FROM ${table} ${alias} ${joins} ${where} LIMIT 1");
 
         return _Select();
     }
@@ -336,19 +354,31 @@ public class Database {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
         List<Map<String, Object>> resultList = new ArrayList<>();
 
-        while (rs.next()) {
-            Map<String, Object> row = new HashMap<>();
-            for (int i = 1; i <= columnCount; i++) {
-                String columnName = metaData.getColumnName(i);
-                Object columnValue = rs.getObject(i);
-                row.put(columnName, columnValue);
-            }
-            resultList.add(row);
+        if (rs.next()) {
+            do {
+                Map<String, Object> row = new HashMap<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnLabel(i);
+                    Object columnValue = rs.getObject(i);
+
+                    if (columnValue instanceof LocalDateTime) {
+                        columnValue = objectMapper.writeValueAsString(columnValue);
+                    }
+
+                    row.put(columnName, columnValue);
+                }
+
+                resultList.add(row);
+            } while (rs.next());
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
+
 
         if (resultList.isEmpty()) {
             return "[]";
@@ -362,8 +392,6 @@ public class Database {
                   INSERT E UPDATE
     ===============================================
      */
-    private String _saveColumns = null;
-    private String _values = null;
 
     public int _validateFields(Map<String, Object> data) {
         int columnCount = 0;
@@ -431,5 +459,171 @@ public class Database {
         this._query = substitutor.replace(this._query);
 
         this.executeUpdate();
+    }
+
+    /*
+    ===============================================
+                  JOINS
+    ===============================================
+     */
+
+
+    /** Function that add a join into join conditions
+     *
+     * @param join
+     * @return
+     */
+    private Database setJoin(String[] join){
+        this._joinConditions.add(join);
+        return this;
+    }
+
+    /** Função que retorna todos os join
+     *
+     * @return String builder com todos os joins
+     */
+    private StringBuilder getJoins() {
+        StringBuilder joinConditionBuilder = new StringBuilder();
+
+        for(String[] condition : this._joinConditions){
+            String joinCondition = String.format("%s %s ON %s.%s %s %s.%s ", condition[0], condition[1], this.getTable(), condition[2], condition[3], condition[1], condition[4]);
+
+            joinConditionBuilder.append(joinCondition);
+        }
+
+        return joinConditionBuilder;
+    }
+
+    /** function that set all table coditions for join
+     *
+     * @param joinType right, left, inner, outer
+     * @param table the database instace of join table
+     * @param tableColumn the actual table colum
+     * @param operator the operator or the join table column
+     * @param joinTableColumn the join table column
+     */
+    private Database Join(String joinType, Database table, String tableColumn, String operator, String joinTableColumn){
+        joinType = joinType.toUpperCase();
+        String[] join = new String[5];
+        String[] _joinCombinations = new String[]{"LEFT", "INNER", "OUTER", "RIGHT"};
+
+        Arrays.parallelSort(_joinCombinations);
+        int index = Arrays.binarySearch(_joinCombinations, joinType);
+
+        join[0] = _joinCombinations[index] + " JOIN";
+        join[1] = table.getTable();
+        join[2] = tableColumn;
+        join[3] = operator;
+        join[4] = joinTableColumn;
+
+        return setJoin(join);
+    }
+
+    /*
+     *   =============== Right Join ===============
+     */
+
+    /** Executa um Right Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database RightJoin(Database table, String tableColumn, String joinTableColumn){
+        return Join("right", table, tableColumn, "=", joinTableColumn);
+    }
+
+    /** Executa um Right Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param operator operador de comparaçao
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database RightJoin(Database table, String tableColumn, String operator, String joinTableColumn){
+        return Join("right", table, tableColumn, operator, joinTableColumn);
+    }
+
+    /*
+     *   =============== Left Join ===============
+     */
+
+    /** Executa um Left Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database LeftJoin(Database table, String tableColumn, String joinTableColumn){
+        return Join("left", table, tableColumn, "=", joinTableColumn);
+    }
+
+    /** Executa um Left Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param operator operador de comparaçao
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database LeftJoin(Database table, String tableColumn, String operator, String joinTableColumn){
+        return Join("left", table, tableColumn, operator, joinTableColumn);
+    }
+
+    /*
+     *   =============== Inner Join ===============
+     */
+
+    /** Executa um Inner Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database InnerJoin(Database table, String tableColumn, String joinTableColumn){
+        return Join("inner", table, tableColumn, "=", joinTableColumn);
+    }
+
+    /** Executa um Inner Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param operator operador de comparaçao
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database InnerJoin(Database table, String tableColumn, String operator, String joinTableColumn){
+        return Join("inner", table, tableColumn, operator, joinTableColumn);
+    }
+
+    /*
+     *   =============== Outer Join ===============
+     */
+
+    /** Executa um Outer Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database OuterJoin(Database table, String tableColumn, String joinTableColumn){
+        return Join("outer", table, tableColumn, "=", joinTableColumn);
+    }
+
+    /** Executa um Outer Join
+     *
+     * @param table instancia do banco de dados da tabela do join
+     * @param tableColumn coluna que será comparada
+     * @param operator operador de comparaçao
+     * @param joinTableColumn coluna da tabela join que sera comparada
+     * @return uma instancia do banco de dados
+     */
+    public Database OuterJoin(Database table, String tableColumn, String operator, String joinTableColumn){
+        return Join("outer", table, tableColumn, operator, joinTableColumn);
     }
 }
