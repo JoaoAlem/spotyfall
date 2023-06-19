@@ -3,7 +3,7 @@ package com.player.spotyfall.modules.custom;
 import com.player.spotyfall.models.AlbumsModel;
 import com.player.spotyfall.modules.Utils;
 import com.player.spotyfall.modules.database.Database;
-import com.player.spotyfall.modules.database.databaseFault;
+import com.player.spotyfall.modules.database.DatabaseFault;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -16,7 +16,7 @@ public class AlbumMethods extends AlbumsModel {
         this.albumsTable = _albums();
     }
 
-    public void SaveAlbum(Map<String, Object> data) throws databaseFault, SQLException {
+    public void SaveAlbum(Map<String, Object> data) throws DatabaseFault, SQLException {
         String id = null;
         try {
             if (data.containsKey("id_album")) {

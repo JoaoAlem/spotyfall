@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.player.spotyfall.modules.custom.UserMethods;
-import com.player.spotyfall.modules.database.databaseFault;
+import com.player.spotyfall.modules.database.DatabaseFault;
 
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -39,7 +39,7 @@ public class UserController extends HttpServlet {
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().write(result);
             }
-        catch (databaseFault | SQLException e) {
+        catch (DatabaseFault | SQLException e) {
             throw new RuntimeException(e);
         }
     }
