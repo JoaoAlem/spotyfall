@@ -9,7 +9,7 @@ export default {
         <form @submit.prevent style="background-color: var(--sidebar)" class="flex flex-col z-10 m-auto text-white">
             <!-- Form Title -->
             <div class="flex mx-auto mb-4">
-                <h2 class="mr-auto ml-2 text-lg" v-if="album.id_album">Editando {{item.title}}</h2>
+                <h2 class="mr-auto ml-2 text-lg" v-if="album.id_album">Editando {{album.albumName}}</h2>
                 <h2 class="mr-auto ml-2 text-lg" v-else>Adicionar Album</h2>
             </div>
             
@@ -64,20 +64,22 @@ export default {
             data.append("id_album", this.album.id_album)
             data.append("albumName", this.album.albumName)
             data.append("tipo", this.album.tipo)
-            data.append("id_artist", "0201f2c1-0979-11ee-9e3e-0242ac110002")
+            data.append("albumImage", this.album.albumImage)
+            data.append("id_artist", this.$root.artist.id_artist)
 
             if(this.selectedFile !== null){
                 data.append("albumImage", this.selectedFile)
             }
 
             this.$root.request("albumController", "put", data)
-                .then((response) => {
+                .then(() => {
                     this.$root.closeModal("modal-edit")
                     this.$root.showSuccess("Album cadastrado")
+                    this.$parent.reload();
 
                     // Limpar
-                    //this.album = Object.assign({}, this.$root.AlbunsModel())
-                    //this.selectedFile = null
+                    this.$parent.AlbumEditing = Object.assign({}, this.$root.AlbunsModel())
+                    this.selectedFile = null
                 })
                 .catch((erro) => this.$root.showError("Não foi possivel cadastrar o album, tente novamente mais tarde" + erro))
         }

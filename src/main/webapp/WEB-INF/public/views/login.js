@@ -63,6 +63,7 @@ export default {
 
                     if(user.id_user) {
                         this.$root.user = this.$root.UserModel(user)
+                        this.$root.setAppArtist()
                         this.$root.$router.replace("home")
                         this.$root.showSuccess("Logado com sucesso")
                     }

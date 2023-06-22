@@ -4,7 +4,7 @@ package com.player.spotyfall.modules.custom;
 import com.player.spotyfall.models.UserModel;
 import com.player.spotyfall.modules.Utils;
 import com.player.spotyfall.modules.database.Database;
-import com.player.spotyfall.modules.database.databaseFault;
+import com.player.spotyfall.modules.database.DatabaseFault;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ public class UserMethods extends UserModel
         userTable = _users();
     }
 
-    public String GetUser(String login, String password) throws databaseFault, SQLException, JsonProcessingException {
+    public String GetUser(String login, String password) throws DatabaseFault, SQLException, JsonProcessingException {
         try{
             return userTable
                     .WhereOr("username", login)
@@ -31,7 +31,7 @@ public class UserMethods extends UserModel
         }
     }
 
-    public void SaveUser(Map<String, Object> data) throws databaseFault, SQLException {
+    public void SaveUser(Map<String, Object> data) throws DatabaseFault, SQLException {
         String id = null;
         try {
             if (data.containsKey("id")) {
