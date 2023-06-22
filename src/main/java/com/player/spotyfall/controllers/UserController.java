@@ -40,7 +40,11 @@ public class UserController extends HttpServlet {
             resp.getWriter().write(result);
             }
         catch (DatabaseFault | SQLException e) {
-            throw new RuntimeException(e);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            String errorMessage = "Error occurred while searching user";
+            String errorJson = "{\"error\":\"" + errorMessage + "\"}";
+            resp.getWriter().write(errorJson);
         }
     }
 

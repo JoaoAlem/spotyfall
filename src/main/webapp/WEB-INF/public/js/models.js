@@ -16,6 +16,15 @@ export class userModel {
     }
 }
 
+export class artistsModel{
+    constructor(i) {
+        define(this, i, {
+            id_artist: null,
+            tradeName: null
+        })
+    }
+}
+
 export class musicModel {
     constructor(i){
         define(this, i, {
@@ -47,8 +56,13 @@ export class albumModel {
             albumName: null,
             albumImage: null,
             tipo: null,
-            creationDate: null,
+            createDate: null,
             id_artist: null,
         })
+    }
+
+    getImageURL(){
+        const {origin} = window.location
+        return `${origin}/spotyfall_war_exploded/public/albumImages/${this.albumImage}`
     }
 }

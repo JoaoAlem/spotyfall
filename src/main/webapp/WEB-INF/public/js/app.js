@@ -1,5 +1,5 @@
 // realizando o import do models e utils
-import { userModel, albumModel } from './models.js'
+import { userModel, albumModel, artistsModel } from './models.js'
 import request from './utils.js'
 
 // Criação dos componentes com conteúdo
@@ -56,6 +56,7 @@ const app = Vue.createApp({
         return {
             iconsColor: "#f6f6f6",
             user: null,
+            artist: null,
             loading: true,
             message: null,
             successComponent: null,
@@ -102,12 +103,21 @@ const app = Vue.createApp({
             modal.classList.add("hidden")
         },
 
+        /* Methods for components */
+        setAppArtist(){
+            this.request("artistsController", "post", {id_user: this.user.id_user})
+                .then( resp => this.artist = this.ArtistsModel(resp.data) )
+        },
+
         /* Models */
         UserModel(data) {
             return new userModel(data)
         },
         AlbunsModel(data) {
             return new albumModel(data)
+        },
+        ArtistsModel(data){
+            return new artistsModel(data)
         }
     },
     mounted() {

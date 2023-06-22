@@ -81,7 +81,7 @@ public class Database {
     private void executeUpdate() throws SQLException {
         PreparedStatement ps = this.conn.prepareStatement(this._query);
 
-        if (this._values != null) {
+        if (Utils.validateString(_values)) {
             String[] valueArray = this._values.split(", ");
             for (int i = 0; i < valueArray.length; i++) {
                 ps.setString(i + 1, valueArray[i]);
@@ -504,20 +504,24 @@ public class Database {
         _queryHelper.put("table", this.table);
 
         if (Utils.validateString(id)) {
-            int columnCount = _validateFields(data);
+            _validateFields(data);
+
+            String[] columns = this._saveColumns.split(",");
+            String[] values = this._values.split(",");
 
             _queryHelper.put("where", this.getWhere().toString());
-            _queryHelper.put("saveColumns", this._saveColumns);
-            _queryHelper.put("values", this._values);
 
             this._query = "UPDATE ${table} SET ";
 
-            // Remove the extra comma
-            if (columnCount > 0) {
-                this._query += "${saveColumns};";
-            } else {
-                this._query = "";
+            for(int i = 0; i < columns.length; i++){
+                this._query += String.format(" %s = ?,",columns[i]);
             }
+
+            // remove the extra comma
+            this._query = this._query.substring(0, this._query.length() - 1);
+
+            // Add where condition
+            this._query += " ${where}";
         } else {
             this._query = "INSERT INTO ${table} (";
 
@@ -700,5 +704,23 @@ public class Database {
      */
     public Database InnerJoin(Database table, String tableColumn, String operator, String joinTableColumn) {
         return Join("inner", table, tableColumn, operator, joinTableColumn);
+    }
+
+    /*
+    ===============================================
+                       DELETE
+    ===============================================
+     */
+
+    public void Delete() throws SQLException {
+        Map<String, String> _queryHelper = new HashMap<>();
+        _queryHelper.put("table", this.table);
+        _queryHelper.put("where", this.getWhere().toString());
+
+        this._query = "DELETE FROM ${table} ${where}";
+
+        StringSubstitutor substitutor = new StringSubstitutor(_queryHelper);
+        this._query = substitutor.replace(this._query);
+        this.executeUpdate();
     }
 }

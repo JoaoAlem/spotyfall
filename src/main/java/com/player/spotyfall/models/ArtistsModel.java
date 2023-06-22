@@ -9,7 +9,7 @@ public class ArtistsModel {
     private final String[] colunas_musicAuthor = new String[]{"id_music", "id_artist"};
 
     /* Metodos do banco de dados */
-    public Database artists(){
+    public Database _artists(){
         return new Database("artists").Columns(colunas_artist);
     }
 

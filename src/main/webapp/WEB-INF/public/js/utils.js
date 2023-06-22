@@ -29,12 +29,22 @@ export function define(model, source, vars){
  * @param callbackError
  */
 async function request(route, method, data) {
-    if (method)
-        return await axios[method](route, data, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        });
+    if (method) {
+        if (method.toLowerCase() === 'delete') {
+            return await axios.delete(route, {
+                data: data,
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        } else {
+            return await axios[method](route, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        }
+    }
 
     return await axios.get(route);
 }

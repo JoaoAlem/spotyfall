@@ -38,7 +38,7 @@ export default {
                             <li>Compartilhar conteúdo na comunidade.</li>
                         </ul>
                     </div>
-                    <button class="ml-auto border rounded-xl p-2 mr-3 lg:mr-7" style="border-color: #7700a6; margin-top: auto !important;">Torne-se um artista</button>     
+                    <button @click="saveArtist" class="ml-auto border rounded-xl p-2 mr-3 lg:mr-7" style="border-color: #7700a6; margin-top: auto !important;">Torne-se um artista</button>     
                 </div>
             </div> 
         </template>
@@ -47,7 +47,17 @@ export default {
         if(!this.$root.user)
             this.$root.$router.replace("/login")
     },
-    mounted(){
+    methods:{
+        saveArtist(){
+            let data = new FormData()
+            data.append("id_user", this.$root.user?.id_user)
 
+            this.$root.request("artistsController", "put", data)
+                .then( () => {
+                    this.$root.showSuccess("Agora vocé um artista")
+                    this.$root.setAppArtist()
+                })
+                .catch( error => this.$root.showError("Não foi possivel completar sua requisição" + error))
+        }
     }
 }
